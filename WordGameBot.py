@@ -9,20 +9,21 @@ letters = np.array([[l for l in letters[j: j + 4]] for j in range(0, len(letters
 print(letters)
 
 d = enchant.Dict("en_US")
-found_words = []
+found_words = set()
+queue = multiprocessing.Queue()
 
 
 def check_rule(x, y):
     return 0 <= x < 4 and 0 <= y < 4
 
 
-def find_words(word_pos_pair, string, positions, limit, lower_limit):
+def find_words(string, positions, limit, lower_limit):
     if limit <= 0:
         return
     limit -= 1
     if len(string) >= lower_limit and d.check(string) and string not in found_words:
-        word_pos_pair.put([string, positions])
-        found_words.append(string)
+        queue.put([string, positions])
+        found_words.add(string)
     last_pos_x = positions[-1][0]
     last_pos_y = positions[-1][1]
 
@@ -33,16 +34,14 @@ def find_words(word_pos_pair, string, positions, limit, lower_limit):
                 pos_x = last_pos_x + x
                 pos_y = last_pos_y + y
                 if check_rule(pos_x, pos_y) and [pos_x, pos_y] not in positions:
-                    find_words(word_pos_pair, string + letters[pos_x][pos_y], positions + [[pos_x, pos_y]], limit,
+                    find_words(string + letters[pos_x][pos_y], positions + [[pos_x, pos_y]], limit,
                                lower_limit)
 
-
-queue = multiprocessing.Queue()
 
 p = []
 for i in range(4):
     for j in range(4):
-        p.append(multiprocessing.Process(target=find_words, args=(queue, letters[i][j], [[i, j]], 8, 2)))
+        p.append(multiprocessing.Process(target=find_words, args=(letters[i][j], [[i, j]], 8, 2)))
 for process in p:
     process.start()
 for process in p:
