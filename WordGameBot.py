@@ -55,7 +55,7 @@ words = sorted(words, key=lambda x: -len(x[0]))
 for pair in words:
     print(pair)
 
-print("Ready?")
+print("Place cursor over top left square")
 print("2")
 time.sleep(1)
 print("1")
@@ -63,7 +63,7 @@ time.sleep(1)
 mouse_x, mouse_y = pyautogui.position()
 print(mouse_x, mouse_y)
 
-print("Ready?")
+print("Place cursor over the square to its right")
 print("3")
 time.sleep(1)
 print("2")
